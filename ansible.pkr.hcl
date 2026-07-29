@@ -22,7 +22,7 @@ source "amazon-ebs" "ansible" {
   instance_type = "t3.micro"
   ssh_username  = "ubuntu"
 
-  associate_public_ip_address = true
+  associate_public_ip_address               = true
   temporary_security_group_source_public_ip = true
 
   ami_name = "ansible-image-${var.image_version}-{{timestamp}}"
@@ -48,11 +48,11 @@ source "amazon-ebs" "ansible" {
   }
 
   tags = {
-    Name        = "ansible-${var.image_version}"
-    Project     = "task-4"
-    Role        = "ansible"
-    Version     = var.image_version
-    BuiltBy     = "packer"
+    Name    = "ansible-${var.image_version}"
+    Project = "task-4"
+    Role    = "ansible"
+    Version = var.image_version
+    BuiltBy = "packer"
   }
 }
 
