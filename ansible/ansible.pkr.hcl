@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "ansible" {
-  region        = eu-central-1
+  region        = "eu-central-1"
   instance_type = "t3.micro"
   ssh_username  = "ubuntu"
 
