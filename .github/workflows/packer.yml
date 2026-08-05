@@ -1,0 +1,97 @@
+name: Build Packer AMI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - labeled
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-web-server:
+    name: Build Web Server AMI
+
+    if: github.event.label.name == 'build:web-server'
+
+    runs-on: ubuntu-latest
+
+    environment: T4-build
+
+    defaults:
+      run:
+        working-directory: ./web-server
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@v3
+
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Packer init
+        run: packer init .
+
+      - name: Packer validate
+        run: packer validate .
+
+      - name: Build Web Server AMI
+        run: packer build .
+
+      - name: Show Web Server AMI ID
+        run: |
+          AMI_ID=$(jq -r '.builds[-1].artifact_id' packer-manifest.json | cut -d: -f2)
+
+          echo "Web Server AMI ID: $AMI_ID"
+          echo "## Web Server AMI: \`$AMI_ID\`" >> "$GITHUB_STEP_SUMMARY"
+
+  build-ansible:
+    name: Build Ansible AMI
+
+    if: github.event.label.name == 'build:ansible'
+
+    runs-on: ubuntu-latest
+
+    environment: T4-build
+
+    defaults:
+      run:
+        working-directory: ./ansible
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@v3
+
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Packer init
+        run: packer init .
+
+      - name: Packer validate
+        run: packer validate .
+
+      - name: Build Ansible AMI
+        run: packer build .
+
+      - name: Show Ansible AMI ID
+        run: |
+          AMI_ID=$(jq -r '.builds[-1].artifact_id' packer-manifest.json | cut -d: -f2)
+
+          echo "Ansible AMI ID: $AMI_ID"
+          echo "## Ansible AMI: \`$AMI_ID\`" >> "$GITHUB_STEP_SUMMARY"

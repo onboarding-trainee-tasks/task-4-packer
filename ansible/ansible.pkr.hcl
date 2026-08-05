@@ -7,25 +7,15 @@ packer {
   }
 }
 
-variable "aws_region" {
-  type    = string
-  default = "eu-central-1"
-}
-
-variable "image_version" {
-  type = string
-}
-
-
 source "amazon-ebs" "ansible" {
-  region        = var.aws_region
+  region        = eu-central-1
   instance_type = "t3.micro"
   ssh_username  = "ubuntu"
 
   associate_public_ip_address               = true
   temporary_security_group_source_public_ip = true
 
-  ami_name = "ansible-image-${var.image_version}-{{timestamp}}"
+  ami_name = "ansible-image-{{timestamp}}"
 
   source_ami_filter {
     filters = {
@@ -48,10 +38,9 @@ source "amazon-ebs" "ansible" {
   }
 
   tags = {
-    Name    = "ansible-${var.image_version}"
+    Name    = "ansible"
     Project = "task-4"
     Role    = "ansible"
-    Version = var.image_version
     BuiltBy = "packer"
   }
 }
@@ -72,5 +61,10 @@ build {
 
   provisioner "shell" {
     script = "scripts/ansible_provision.sh"
+  }
+
+  post-processor "manifest" {
+    output     = "packer-manifest.json"
+    strip_path = true
   }
 }
