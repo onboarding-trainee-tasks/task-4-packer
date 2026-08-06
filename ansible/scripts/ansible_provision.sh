@@ -1,4 +1,4 @@
-chmod 600 /home/ubuntu/.ssh/terraform-ssh-key.pem
+chmod 600 /home/ubuntu/.ssh/ansible_ssh_private_key
 chmod 700 /home/ubuntu/.ssh
 
 sudo apt update
