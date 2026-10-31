@@ -80,6 +80,13 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: Create SSH private key file
+        env:
+          SSH_PRIVATE_KEY_B64: ${{ secrets.ANSIBLE_SSH_PRIVATE_KEY_B64 }}
+        run: |
+          echo "$SSH_PRIVATE_KEY_B64" | base64 --decode > ssh_private_key
+          chmod 600 ssh_private_key
+
       - name: Packer init
         run: packer init .
 
@@ -95,3 +102,7 @@ jobs:
 
           echo "Ansible AMI ID: $AMI_ID"
           echo "## Ansible AMI: \`$AMI_ID\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove SSH private key file
+        if: always()
+        run: rm -f ssh_private_key

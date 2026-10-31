@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "ansible" {
-  region        = eu-central-1
+  region        = "eu-central-1"
   instance_type = "t3.micro"
   ssh_username  = "ubuntu"
 
@@ -51,8 +51,8 @@ build {
   ]
 
   provisioner "file" {
-    source      = "C:/Onboarding/.ssh/terraform-ssh-key.pem"
-    destination = "/home/ubuntu/.ssh/terraform-ssh-key.pem"
+    source      = "ssh_private_key"
+    destination = "/home/ubuntu/.ssh/ansible_ssh_private_key"
   }
 
   provisioner "shell" {
